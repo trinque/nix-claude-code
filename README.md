@@ -69,17 +69,7 @@ nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
 }
 ```
 
-### Option 2: Environment Variable (Temporary)
-
-For ad-hoc usage without persistent configuration:
-
-```bash
-NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
-```
-
-**Note:** Requires `--impure` flag to access environment variables in flakes.
-
-### Option 3: Global Allow (Not Recommended)
+### Option 2: Global Allow (Not Recommended)
 
 Only use if you understand the implications:
 
@@ -145,15 +135,13 @@ nix.settings = {
 Try Claude Code without installation:
 
 ```bash
-# Run Claude Code directly (requires --impure for unfree licence)
-NIXPKGS_ALLOW_UNFREE=1 nix run --impure github:ryoppippi/claude-code-overlay
+# Run Claude Code directly
+nix run github:ryoppippi/claude-code-overlay
 
 # Or enter a shell with Claude Code available
-NIXPKGS_ALLOW_UNFREE=1 nix shell --impure github:ryoppippi/claude-code-overlay
+nix shell github:ryoppippi/claude-code-overlay
 claude --version
 ```
-
-To avoid typing `NIXPKGS_ALLOW_UNFREE=1 --impure` every time, configure unfree package allowance as described in the [Unfree Licence Notice](#unfree-licence-notice) section above.
 
 ### With Flakes
 
@@ -385,7 +373,7 @@ claude-code-overlay.packages.${system}.default
 
 ```bash
 # Run a specific version directly
-NIXPKGS_ALLOW_UNFREE=1 nix run --impure 'github:ryoppippi/claude-code-overlay#"2.1.81"'
+nix run 'github:ryoppippi/claude-code-overlay#"2.1.81"'
 ```
 
 All versions that have been tracked by this repository are available. See the [`versions/`](./versions) directory for available versions.
@@ -455,7 +443,7 @@ nix develop ./dev
 ### Test the overlay
 
 ```bash
-NIXPKGS_ALLOW_UNFREE=1 nix build --impure
+nix build
 ./result/bin/claude --version
 ```
 
