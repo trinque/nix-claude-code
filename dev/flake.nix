@@ -40,12 +40,17 @@
         }:
         let
           treefmtEval = treefmt-nix.lib.evalModule pkgs {
-            projectRootFile = "flake.nix";
+            projectRootFile = ".git/config";
             programs = {
               nixfmt.enable = true;
               deadnix.enable = true;
               statix.enable = true;
               typos.enable = true;
+            };
+            settings.formatter.oxfmt = {
+              command = "${pkgs.oxfmt}/bin/oxfmt";
+              options = [ "--no-error-on-unmatched-pattern" ];
+              includes = [ "*" ];
             };
           };
         in
