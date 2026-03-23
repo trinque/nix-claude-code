@@ -63,6 +63,12 @@
                   enable = true;
                   package = treefmtEval.config.build.wrapper;
                 };
+                renovate-config-validator = {
+                  enable = true;
+                  entry = "${pkgs.renovate}/bin/renovate-config-validator";
+                  files = "renovate\\.json5?$";
+                  language = "system";
+                };
               };
             };
           };
