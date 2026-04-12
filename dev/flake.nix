@@ -17,13 +17,13 @@
   };
 
   outputs =
-    inputs@{
-      flake-parts,
-      git-hooks,
-      treefmt-nix,
-      ...
-    }:
+    inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.treefmt-nix.flakeModule
+        inputs.git-hooks.flakeModule
+      ];
+
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -33,13 +33,12 @@
 
       perSystem =
         {
+          config,
           pkgs,
-          self',
-          system,
           ...
         }:
-        let
-          treefmtEval = treefmt-nix.lib.evalModule pkgs {
+        {
+          treefmt = {
             projectRootFile = ".git/config";
             programs = {
               nixfmt.enable = true;
@@ -49,38 +48,41 @@
               oxfmt.enable = true;
             };
           };
-        in
-        {
-          checks = {
-            git-hooks-check = git-hooks.lib.${system}.run {
-              src = ./..;
-              hooks = {
-                treefmt = {
-                  enable = true;
-                  package = treefmtEval.config.build.wrapper;
-                };
-                renovate-config-validator = {
-                  enable = true;
-                  entry = "${pkgs.renovate}/bin/renovate-config-validator";
-                  files = "renovate\\.json5?$";
-                  language = "system";
-                };
+
+          pre-commit.settings = {
+            src = ./..;
+            package = pkgs.prek;
+            hooks = {
+              treefmt = {
+                enable = true;
+                package = config.treefmt.build.wrapper;
               };
-              package = pkgs.prek;
+              renovate-config-validator = {
+                enable = true;
+                entry = "${pkgs.renovate}/bin/renovate-config-validator";
+                files = "renovate\\.json5?$";
+                language = "system";
+              };
+              gitleaks = {
+                enable = true;
+                name = "gitleaks";
+                entry = "${pkgs.gitleaks}/bin/gitleaks protect --staged --config ${./../.gitleaks.toml}";
+                language = "system";
+                pass_filenames = false;
+              };
             };
           };
-
-          formatter = treefmtEval.config.build.wrapper;
 
           packages = {
             inherit (pkgs) typos typos-lsp;
           };
 
           devShells.default = pkgs.mkShellNoCC {
-            inherit (self'.checks.git-hooks-check) shellHook;
+            inherit (config.pre-commit) shellHook;
             packages = [
-              self'.packages.typos
-              self'.packages.typos-lsp
+              config.packages.typos
+              config.packages.typos-lsp
+              pkgs.gitleaks
             ];
           };
         };
