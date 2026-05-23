@@ -41,7 +41,7 @@
           mkClaude =
             sourcesFile:
             pkgs.callPackage ./package.nix {
-              additionalPaths = [ "${pkgs.gh}/bin" ];
+              additionalPaths = [ pkgs.gh ];
               inherit sourcesFile;
             };
 

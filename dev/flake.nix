@@ -59,14 +59,14 @@
               };
               renovate-config-validator = {
                 enable = true;
-                entry = "${pkgs.renovate}/bin/renovate-config-validator";
+                entry = "${pkgs.lib.getExe' pkgs.renovate "renovate-config-validator"}";
                 files = "renovate\\.json5?$";
                 language = "system";
               };
               gitleaks = {
                 enable = true;
                 name = "gitleaks";
-                entry = "${pkgs.gitleaks}/bin/gitleaks protect --staged --config ${./../.gitleaks.toml}";
+                entry = "${pkgs.lib.getExe pkgs.gitleaks} protect --staged --config ${./../.gitleaks.toml}";
                 language = "system";
                 pass_filenames = false;
               };
